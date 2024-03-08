@@ -69,6 +69,8 @@ EOF
 
 # Check for syntax errors and restart Nginx
 echo "Checking Nginx configuration for syntax errors..."
+sudo rm /etc/nginx/sites-enabled/default
+sudo systemctl reload nginx
 nginx -t && systemctl restart nginx
 
 if [ $? -ne 0 ]; then
