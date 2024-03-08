@@ -40,14 +40,6 @@ sudo chown -R mongodb:mongodb /var/log/mongodb
 # Starting MongoDB Service
 sudo systemctl start mongod
 
-# Checking if MongoDB is running and listening on port 27017
-if sudo ss -tulwn | grep 27017; then
-    echo "MongoDB is running and listening on port 27017."
-else
-    echo "MongoDB failed to start or is not listening on port 27017. Please check the service status and configuration."
-    exit 1
-fi
-
 # Installing MongoDB Shell (mongosh)
 wget https://downloads.mongodb.com/compass/mongosh-2.1.5-linux-x64.tgz -O mongosh.tgz
 tar -zxvf mongosh.tgz
