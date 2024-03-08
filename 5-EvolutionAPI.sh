@@ -1,33 +1,76 @@
 #!/bin/bash
 
-# Check if running as root
+# Ensure the script is run as root
 if [ "$(id -u)" != "0" ]; then
     echo "This script must be run as root" >&2
     exit 1
 fi
 
-# Clone the Evolution API repository
-echo "Cloning Evolution API repository..."
+# 1. Install Docker Compose
+echo "Updating and installing Docker..."
+sudo apt update && sudo apt upgrade -y
+sudo apt-get remove docker docker-engine docker.io containerd runc -y
+sudo apt-get update
+sudo apt-get install ca-certificates curl gnupg lsb-release -y
+sudo mkdir -p /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+sudo apt-get update
+sudo apt-get install docker-ce docker-ce-cli containerd.io docker-compose-plugin -y
+
+# Wait 5 seconds
+echo "Waiting for 5 seconds..."
+sleep 5
+
+# 2. Setup Evolution API environment
+echo "Cloning Evolution API repository and setting up the environment..."
 git clone https://github.com/EvolutionAPI/evolution-api.git
 cd evolution-api
-
-# Update and install dependencies
-echo "Installing dependencies..."
-sudo apt-get update
-sudo apt-get install -y git zip unzip nload snapd curl wget nodejs npm
-
-# Install global npm packages
-echo "Installing global npm packages..."
-npm install -g npm@latest
+sudo apt install npm -y
 npm install -g typescript
+sudo apt-get install -y nodejs
+npm install -g npm@latest
 npm install -g pm2@latest
-
-# Copy development environment file to production environment file
-echo "Setting up environment configuration..."
+sudo apt-get install -y git zip unzip nload snapd curl wget
 cp src/dev-env.yml src/env.yml
 
-# Instructions for editing the environment configuration
-echo "Please manually edit 'src/env.yml' to configure your environment."
-echo "Use any text editor of your choice, for example:"
-echo "nano src/env.yml"
-echo "After editing, you can start your application."
+# Wait 3 seconds
+echo "Waiting for 3 seconds..."
+sleep 3
+
+# 3. Configuration prompts
+read -p "Enter your subdomain: " sub_domain
+read -p "MongoDB details (Press Enter to use defaults): "
+read -p "Database name (Press Enter to use db_mongo): " db_mongo
+read -p "Database user (Press Enter to use db_mongo_user): " db_mongo_user
+read -p "Database password (Press Enter to use mongo_db_pass): " mongo_db_pass
+server_ip=$(hostname -I | awk '{print $1}')
+echo "Current server IP is $server_ip. Is this correct? (y/n): "
+read server_ip_correct
+if [ "$server_ip_correct" != "y" ]; then
+    read -p "Enter the correct server IP: " server_ip
+fi
+read -p "Enter Redis password: " redis_pass
+api_key="B6D711FCDE4D4FD5936544120E713976"
+read -p "API Key is $api_key. Do you want to change it? (y/n): " change_api_key
+if [ "$change_api_key" == "y" ]; then
+    read -p "Enter a new API Key (at least 12 letters): " api_key
+fi
+
+# Apply configurations to src/env.yml
+echo "Applying configurations..."
+sudo sed -i "s|URL: localhost|URL: http://$sub_domain|" src/env.yml
+sudo sed -i "s|# - yourdomain.com|- $sub_domain|" src/env.yml
+sudo sed -i "s|/etc/letsencrypt/live/<domain>/privkey.pem|/etc/letsencrypt/live/$sub_domain/privkey.pem|" src/env.yml
+sudo sed -i "s|/etc/letsencrypt/live/<domain>/fullchain.pem|/etc/letsencrypt/live/$sub_domain/fullchain.pem|" src/env.yml
+sudo sed -i "s|mongodb://root:root@localhost:27017/?authSource=admin&readPreference=primary&ssl=false&directConnection=true|mongodb://$db_mongo_user:$mongo_db_pass@$server_ip:27017/$db_mongo?authSource=admin&readPreference=primary&ssl=false&directConnection=true|" src/env.yml
+sudo sed -i "s|redis://localhost:6379|redis://:$redis_pass@$server_ip:6379|" src/env.yml
+sudo sed -i "s|KEY: B6D711FCDE4D4FD5936544120E713976|KEY: $api_key|" src/env.yml
+
+# Final setup steps
+echo "Finalizing setup..."
+sudo apt update && sudo apt -y upgrade
+npm install
+npm run build
+
+echo "Setup completed. Navigate to the evolution-api directory to start your application."
