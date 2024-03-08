@@ -39,36 +39,31 @@ else
     sudo sed -i '/security:/a\  authorization: enabled' /etc/mongod.conf
 fi
 
+# Ensure MongoDB data and log directory permissions are correct
+sudo chown -R mongodb:mongodb /var/lib/mongodb
+sudo chown -R mongodb:mongodb /var/log/mongodb
+
 # Starting MongoDB Service and waiting for it to fully start
-sudo systemctl start mongod
-echo "Waiting for MongoDB to start..."
-sleep 10  # Wait 10 seconds to ensure MongoDB has started
+sudo systemctl restart mongod
+echo "Waiting for MongoDB to fully start..."
+sleep 10  # Wait 10 seconds
 
-# Checking MongoDB Service Status
-echo "Checking MongoDB service status..."
-sudo systemctl status mongod | grep "active (running)" && echo "MongoDB is active and running." || echo "MongoDB service is not running as expected."
-
-# Checking if MongoDB is running and listening on port 27017, with retry logic
-retry_count=0
-max_retries=5
-while ! sudo ss -tulwn | grep 27017; do
-    if [ "$retry_count" -eq "$max_retries" ]; then
-        echo "MongoDB failed to start or is not listening on port 27017 after several attempts. Please check the service status and configuration."
-        exit 1
-    fi
-    echo "Waiting for MongoDB to listen on port 27017..."
-    sleep 5  # Wait 5 more seconds
-    ((retry_count++))
-done
-echo "MongoDB is running and listening on port 27017."
+# Verifying MongoDB has started
+if sudo systemctl is-active --quiet mongod; then
+    echo "MongoDB is active and running."
+else
+    echo "MongoDB service is not running as expected."
+    echo "Checking MongoDB status for errors..."
+    sudo systemctl status mongod
+    echo "Reviewing the last 20 lines from MongoDB log for errors..."
+    sudo tail -n 20 /var/log/mongodb/mongod.log
+    exit 1
+fi
 
 # Installing MongoDB Shell (mongosh)
 wget https://downloads.mongodb.com/compass/mongosh-2.1.5-linux-x64.tgz -O mongosh.tgz
 tar -zxvf mongosh.tgz
 sudo mv mongosh-2.1.5-linux-x64/bin/mongosh /usr/local/bin/
-
-# Restarting MongoDB service to apply security settings
-sudo systemctl restart mongod
 
 # Determine the server's primary IP address
 server_ip=$(hostname -I | awk '{print $1}')
@@ -101,6 +96,7 @@ done
 
 if [ "$success" != true ]; then
     echo "Failed to create MongoDB user after several attempts."
+    exit 1
 fi
 
 echo "MongoDB installation and user setup complete."
