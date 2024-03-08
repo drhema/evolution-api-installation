@@ -39,11 +39,6 @@ Verify MongoDB is listening on port 27017:
 sudo ss -tulwn | grep 27017
 ```
 
-If necessary, repair MongoDB:
-
-```bash
-mongod --repair --dbpath /var/lib/mongodb
-```
 
 ### 2. Install Redis
 
@@ -63,7 +58,7 @@ wget https://raw.githubusercontent.com/drhema/evolution-api-installation/main/3-
 
 ### 4. Install Nginx
 
-Install Nginx and configure SSL with Let's Encrypt:
+Install Nginx and configure SSL with Let's Encrypt: insert your subdomain ex: api.yourdomain.com & your email address email@yourdomain.com
 
 ```bash
 wget https://raw.githubusercontent.com/drhema/evolution-api-installation/main/4-nginx.sh && chmod +x 4-nginx.sh && ./4-nginx.sh
