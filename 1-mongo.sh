@@ -39,16 +39,28 @@ else
     sudo sed -i '/security:/a\  authorization: enabled' /etc/mongod.conf
 fi
 
-# Starting MongoDB Service
+# Starting MongoDB Service and waiting for it to fully start
 sudo systemctl start mongod
+echo "Waiting for MongoDB to start..."
+sleep 10  # Wait 10 seconds to ensure MongoDB has started
 
-# Checking if MongoDB is running and listening on port 27017
-if sudo ss -tulwn | grep 27017; then
-    echo "MongoDB is running and listening on port 27017."
-else
-    echo "MongoDB failed to start or is not listening on port 27017. Please check the service status and configuration."
-    exit 1
-fi
+# Checking MongoDB Service Status
+echo "Checking MongoDB service status..."
+sudo systemctl status mongod | grep "active (running)" && echo "MongoDB is active and running." || echo "MongoDB service is not running as expected."
+
+# Checking if MongoDB is running and listening on port 27017, with retry logic
+retry_count=0
+max_retries=5
+while ! sudo ss -tulwn | grep 27017; do
+    if [ "$retry_count" -eq "$max_retries" ]; then
+        echo "MongoDB failed to start or is not listening on port 27017 after several attempts. Please check the service status and configuration."
+        exit 1
+    fi
+    echo "Waiting for MongoDB to listen on port 27017..."
+    sleep 5  # Wait 5 more seconds
+    ((retry_count++))
+done
+echo "MongoDB is running and listening on port 27017."
 
 # Installing MongoDB Shell (mongosh)
 wget https://downloads.mongodb.com/compass/mongosh-2.1.5-linux-x64.tgz -O mongosh.tgz
@@ -70,9 +82,25 @@ echo "Enter the password for the MongoDB user:"
 read -s password
 
 # Use the server's IP address for the MongoDB connection string in the mongosh command
-mongosh --host $server_ip --port 27017 <<EOF
+echo "Attempting to create MongoDB user..."
+success=false
+for attempt in {1..5}; do
+    if mongosh --host $server_ip --port 27017 <<EOF
 use $dbname
 db.createUser({user: "$username", pwd: "$password", roles:["readWrite"]})
 EOF
+    then
+        success=true
+        echo "MongoDB user created successfully."
+        break
+    else
+        echo "Attempt $attempt to create MongoDB user failed. Retrying in 5 seconds..."
+        sleep 5
+    fi
+done
+
+if [ "$success" != true ]; then
+    echo "Failed to create MongoDB user after several attempts."
+fi
 
 echo "MongoDB installation and user setup complete."
