@@ -43,22 +43,9 @@ fi
 sudo chown -R mongodb:mongodb /var/lib/mongodb
 sudo chown -R mongodb:mongodb /var/log/mongodb
 
-# Starting MongoDB Service and waiting for it to fully start
+# Starting MongoDB Service
 sudo systemctl restart mongod
-echo "Waiting for MongoDB to fully start..."
-sleep 10  # Wait 10 seconds
-
-# Verifying MongoDB has started
-if sudo systemctl is-active --quiet mongod; then
-    echo "MongoDB is active and running."
-else
-    echo "MongoDB service is not running as expected."
-    echo "Checking MongoDB status for errors..."
-    sudo systemctl status mongod
-    echo "Reviewing the last 20 lines from MongoDB log for errors..."
-    sudo tail -n 20 /var/log/mongodb/mongod.log
-    exit 1
-fi
+echo "MongoDB is being restarted to apply configurations..."
 
 # Installing MongoDB Shell (mongosh)
 wget https://downloads.mongodb.com/compass/mongosh-2.1.5-linux-x64.tgz -O mongosh.tgz
@@ -78,24 +65,17 @@ read -s password
 
 # Use the server's IP address for the MongoDB connection string in the mongosh command
 echo "Attempting to create MongoDB user..."
-success=false
-for attempt in {1..5}; do
-    if mongosh --host $server_ip --port 27017 <<EOF
+if mongosh --host $server_ip --port 27017 <<EOF
 use $dbname
 db.createUser({user: "$username", pwd: "$password", roles:["readWrite"]})
 EOF
-    then
-        success=true
-        echo "MongoDB user created successfully."
-        break
-    else
-        echo "Attempt $attempt to create MongoDB user failed. Retrying in 5 seconds..."
-        sleep 5
-    fi
-done
-
-if [ "$success" != true ]; then
-    echo "Failed to create MongoDB user after several attempts."
+then
+    echo "MongoDB user created successfully."
+else
+    echo "Failed to create MongoDB user. Checking MongoDB service status..."
+    sudo systemctl status mongod | grep "active (running)" && echo "MongoDB is active and running." || echo "MongoDB service is not running as expected."
+    echo "Reviewing the last 20 lines from MongoDB log for errors..."
+    sudo tail -n 20 /var/log/mongodb/mongod.log
     exit 1
 fi
 
