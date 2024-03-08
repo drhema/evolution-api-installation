@@ -66,7 +66,7 @@ sudo sed -i "s|# - yourdomain.com|- \"$sub_domain\"|" src/env.yml
 sudo sed -i "s|/etc/letsencrypt/live/<domain>/privkey.pem|/etc/letsencrypt/live/$sub_domain/privkey.pem|" src/env.yml
 sudo sed -i "s|/etc/letsencrypt/live/<domain>/fullchain.pem|/etc/letsencrypt/live/$sub_domain/fullchain.pem|" src/env.yml
 sudo sed -i "s|mongodb://root:root@localhost:27017/?authSource=admin&readPreference=primary&ssl=false&directConnection=true|mongodb://$db_mongo_user:$mongo_db_pass@$server_ip:27017/$db_mongo?authSource=admin&readPreference=primary&ssl=false&directConnection=true|" src/env.yml
-sudo sed -i "s|redis://localhost:6379|redis://:$redis_pass@$server_ip:6379|" src/env.yml
+sudo sed -i "s|redis://localhost:6379|redis://$redis_pass@$server_ip:6379|" src/env.yml
 sudo sed -i "s|KEY: B6D711FCDE4D4FD5936544120E713976|KEY: $api_key|" src/env.yml
 
 # Wait 5 seconds before the final setup
