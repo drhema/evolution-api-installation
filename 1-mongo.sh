@@ -28,20 +28,34 @@ echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-archive-keyri
 sudo apt-get update
 sudo apt-get install -y mongodb-org
 
-# Starting and Enabling MongoDB Service
+# Configuring MongoDB to listen on both localhost and all network interfaces
+sudo sed -i '/  bindIp:/c\  bindIp: 127.0.0.1,0.0.0.0' /etc/mongod.conf
+
+# Automatically enabling security and authorization
+if ! grep -q "security:" /etc/mongod.conf; then
+    echo "security:" | sudo tee -a /etc/mongod.conf
+    echo "  authorization: enabled" | sudo tee -a /etc/mongod.conf
+else
+    sudo sed -i '/security:/a\  authorization: enabled' /etc/mongod.conf
+fi
+
+# Starting MongoDB Service
 sudo systemctl start mongod
-sudo systemctl enable mongod
+
+# Checking if MongoDB is running and listening on port 27017
+if sudo ss -tulwn | grep 27017; then
+    echo "MongoDB is running and listening on port 27017."
+else
+    echo "MongoDB failed to start or is not listening on port 27017. Please check the service status and configuration."
+    exit 1
+fi
 
 # Installing MongoDB Shell (mongosh)
 wget https://downloads.mongodb.com/compass/mongosh-2.1.5-linux-x64.tgz -O mongosh.tgz
 tar -zxvf mongosh.tgz
 sudo mv mongosh-2.1.5-linux-x64/bin/mongosh /usr/local/bin/
 
-# Automatically updating /etc/mongod.conf with required settings
-sudo sed -i '/  bindIp: 127.0.0.1/a\  bindIp: 0.0.0.0' /etc/mongod.conf # Add bindIp setting
-echo "security:" | sudo tee -a /etc/mongod.conf
-echo "  authorization: enabled" | sudo tee -a /etc/mongod.conf
-
+# Restarting MongoDB service to apply security settings
 sudo systemctl restart mongod
 
 # Prompt for Database Name, User, and Password
