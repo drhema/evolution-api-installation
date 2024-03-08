@@ -63,5 +63,4 @@ Detach from the screen session by pressing Ctrl+A followed by D.
 
 ```bash
 
-
 Copy the entire block above into your GitHub repository as a `README.md` file to provide a comprehensive installation guide for users.
