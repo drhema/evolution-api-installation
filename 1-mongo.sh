@@ -58,6 +58,9 @@ sudo mv mongosh-2.1.5-linux-x64/bin/mongosh /usr/local/bin/
 # Restarting MongoDB service to apply security settings
 sudo systemctl restart mongod
 
+# Determine the server's primary IP address
+server_ip=$(hostname -I | awk '{print $1}')
+
 # Prompt for Database Name, User, and Password
 echo "Enter the name of the MongoDB database:"
 read dbname
@@ -66,8 +69,8 @@ read username
 echo "Enter the password for the MongoDB user:"
 read -s password
 
-# Create MongoDB User
-mongosh <<EOF
+# Use the server's IP address for the MongoDB connection string in the mongosh command
+mongosh --host $server_ip --port 27017 <<EOF
 use $dbname
 db.createUser({user: "$username", pwd: "$password", roles:["readWrite"]})
 EOF
