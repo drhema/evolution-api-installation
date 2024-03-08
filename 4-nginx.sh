@@ -14,6 +14,9 @@ apt-get install -y nginx certbot python3-certbot-nginx snapd
 # Ask user for the server name
 read -p "Enter the server name (subdomain): " SERVER_NAME
 
+# Prompt the user for their email address for Let's Encrypt
+read -p "Enter your email address for Let's Encrypt notifications: " LETSENCRYPT_EMAIL
+
 # Update firewall rules as requested
 echo "Updating firewall rules..."
 ufw allow 3000/tcp
@@ -24,8 +27,8 @@ ufw allow OpenSSH
 ufw --force enable
 
 # Obtain SSL certificates from Let's Encrypt
-echo "Obtaining SSL certificates from Let's Encrypt for $SERVER_NAME..."
-certbot --nginx -d $SERVER_NAME --non-interactive --agree-tos --email your-email@example.com --redirect
+echo "Obtaining SSL certificates from Let's Encrypt for $SERVER_NAME using email $LETSENCRYPT_EMAIL..."
+certbot --nginx -d $SERVER_NAME --non-interactive --agree-tos --email $LETSENCRYPT_EMAIL --redirect
 
 # Check if the SSL certificate was successfully obtained and nginx config was adjusted
 if [ $? -ne 0 ]; then
