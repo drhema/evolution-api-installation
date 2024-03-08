@@ -13,7 +13,7 @@ Download and run the MongoDB installation script:
 ```bash
 wget https://raw.githubusercontent.com/drhema/evolution-api-installation/main/1-mongo.sh && chmod +x 1-mongo.sh && ./1-mongo.sh
 
-Check the status of MongoDB and ensure it is running:
+### 1.1. Check the status of MongoDB and ensure it is running:
 
 bash
 Copy code
