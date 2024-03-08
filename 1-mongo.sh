@@ -37,8 +37,11 @@ wget https://downloads.mongodb.com/compass/mongosh-2.1.5-linux-x64.tgz -O mongos
 tar -zxvf mongosh.tgz
 sudo mv mongosh-2.1.5-linux-x64/bin/mongosh /usr/local/bin/
 
-# Configuring MongoDB with Authentication
-sudo sed -i '/security:/a\  authorization: enabled' /etc/mongod.conf
+# Automatically updating /etc/mongod.conf with required settings
+sudo sed -i '/  bindIp: 127.0.0.1/a\  bindIp: 0.0.0.0' /etc/mongod.conf # Add bindIp setting
+echo "security:" | sudo tee -a /etc/mongod.conf
+echo "  authorization: enabled" | sudo tee -a /etc/mongod.conf
+
 sudo systemctl restart mongod
 
 # Prompt for Database Name, User, and Password
