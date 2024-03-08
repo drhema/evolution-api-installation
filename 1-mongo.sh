@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Updating and Installing Deendencies
+# Updating and Installing Dependencies
 sudo apt-get update
 sudo apt-get install -y libcurl4 libgssapi-krb5-2 libldap-2.5-0 libwrap0 libsasl2-2 libsasl2-modules libsasl2-modules-gssapi-mit openssl liblzma5
 
@@ -9,16 +9,9 @@ sudo apt-get install -y ufw
 sudo ufw enable
 
 # Allowing Necessary Ports
-sudo ufw allow 10000/tcp
 sudo ufw allow 80/tcp
 sudo ufw allow 443/tcp
-sudo ufw allow 3000/tcp
-sudo ufw allow 6379/tcp
-sudo ufw allow 5432/tcp
-sudo ufw allow 8025/tcp
-sudo ufw allow 8080/tcp
 sudo ufw allow 27017/tcp
-sudo ufw allow 3306/tcp
 
 # Adding MongoDB Repository
 wget -qO - https://www.mongodb.org/static/pgp/server-7.0.asc | sudo gpg --dearmor -o /usr/share/keyrings/mongodb-archive-keyring.gpg
@@ -39,6 +32,10 @@ if ! grep -q "authorization: enabled" /etc/mongod.conf; then
         echo -e "security:\n  authorization: enabled" | sudo tee -a /etc/mongod.conf
     fi
 fi
+
+# Ensure MongoDB data and log directory permissions are correct
+sudo chown -R mongodb:mongodb /var/lib/mongodb
+sudo chown -R mongodb:mongodb /var/log/mongodb
 
 # Starting MongoDB Service
 sudo systemctl start mongod
