@@ -6,6 +6,8 @@ This guide outlines the necessary steps to install MongoDB, Redis, Nginx, and th
 ## Prerequisites
 
 - Ensure your system is up to date.
+- Ubuntu 22.0 or above
+- Must login with user root
 - Make sure `wget` is installed before proceeding with the installations.
 
 ## Installation Steps
