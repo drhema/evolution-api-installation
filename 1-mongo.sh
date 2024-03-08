@@ -7,7 +7,18 @@ sudo apt-get install -y libcurl4 libgssapi-krb5-2 libldap-2.5-0 libwrap0 libsasl
 # Installing and Configuring UFW
 sudo apt-get install -y ufw
 sudo ufw enable
+
+# Allowing Necessary Ports
+sudo ufw allow 10000/tcp
+sudo ufw allow 80/tcp
+sudo ufw allow 443/tcp
+sudo ufw allow 3000/tcp
+sudo ufw allow 6379/tcp
+sudo ufw allow 5432/tcp
+sudo ufw allow 8025/tcp
+sudo ufw allow 8080/tcp
 sudo ufw allow 27017/tcp
+sudo ufw allow 3306/tcp
 
 # Adding MongoDB Repository
 wget -qO - https://www.mongodb.org/static/pgp/server-7.0.asc | sudo gpg --dearmor -o /usr/share/keyrings/mongodb-archive-keyring.gpg
