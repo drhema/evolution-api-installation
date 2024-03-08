@@ -40,10 +40,12 @@ sleep 3
 
 # 3. Configuration prompts
 read -p "Enter your subdomain: " sub_domain
+# MongoDB details (using defaults for simplicity, modify as needed)
 read -p "MongoDB details (Press Enter to use defaults): "
 read -p "Database name (Press Enter to use db_mongo): " db_mongo
 read -p "Database user (Press Enter to use db_mongo_user): " db_mongo_user
 read -p "Database password (Press Enter to use mongo_db_pass): " mongo_db_pass
+# Server IP prompt
 server_ip=$(hostname -I | awk '{print $1}')
 echo "Current server IP is $server_ip. Is this correct? (y/n): "
 read server_ip_correct
@@ -60,16 +62,21 @@ fi
 # Apply configurations to src/env.yml
 echo "Applying configurations..."
 sudo sed -i "s|URL: localhost|URL: http://$sub_domain|" src/env.yml
-sudo sed -i "s|# - yourdomain.com|- $sub_domain|" src/env.yml
+sudo sed -i "s|# - yourdomain.com|- \"$sub_domain\"|" src/env.yml
 sudo sed -i "s|/etc/letsencrypt/live/<domain>/privkey.pem|/etc/letsencrypt/live/$sub_domain/privkey.pem|" src/env.yml
 sudo sed -i "s|/etc/letsencrypt/live/<domain>/fullchain.pem|/etc/letsencrypt/live/$sub_domain/fullchain.pem|" src/env.yml
 sudo sed -i "s|mongodb://root:root@localhost:27017/?authSource=admin&readPreference=primary&ssl=false&directConnection=true|mongodb://$db_mongo_user:$mongo_db_pass@$server_ip:27017/$db_mongo?authSource=admin&readPreference=primary&ssl=false&directConnection=true|" src/env.yml
 sudo sed -i "s|redis://localhost:6379|redis://:$redis_pass@$server_ip:6379|" src/env.yml
 sudo sed -i "s|KEY: B6D711FCDE4D4FD5936544120E713976|KEY: $api_key|" src/env.yml
 
-# Final setup steps
+# Wait 5 seconds before the final setup
+echo "Waiting for 5 seconds..."
+sleep 5
+
 echo "Finalizing setup..."
 sudo apt update && sudo apt -y upgrade
+
+# npm and build the application
 npm install
 npm run build
 
