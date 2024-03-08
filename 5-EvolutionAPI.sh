@@ -76,13 +76,14 @@ sudo sed -i "s|KEY: B6D711FCDE4D4FD5936544120E713976|KEY: $api_key|" src/env.yml
 
 # Wait 5 seconds before the final setup
 echo "Waiting for 5 seconds..."
-sleep 5
+sleep 2
 
 echo "Finalizing setup..."
 sudo apt update && sudo apt -y upgrade
-
+sudo systemctl reload nginx
+nginx -t && systemctl restart nginx
 # npm and build the application
 npm install
 npm run build
 
-echo "Setup completed. Navigate to the evolution-api directory to start your application."
+echo "Setup completed. Navigate to the evolution-api directory to start your application. write cd evolution-api then write screen then npm run start:prod"
