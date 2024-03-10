@@ -5,13 +5,13 @@ sudo apt-get update
 sudo apt-get install -y libcurl4 libgssapi-krb5-2 libldap-2.5-0 libwrap0 libsasl2-2 libsasl2-modules libsasl2-modules-gssapi-mit openssl liblzma5
 
 # Installing and Configuring UFW
-sudo apt-get install -y ufw
-sudo ufw enable
+# sudo apt-get install -y ufw
+# sudo ufw enable
 
 # Allowing Necessary Ports
-sudo ufw allow 80/tcp
-sudo ufw allow 443/tcp
-sudo ufw allow 27017/tcp
+# sudo ufw allow 80/tcp
+# sudo ufw allow 443/tcp
+# sudo ufw allow 27017/tcp
 
 # Adding MongoDB Repository
 wget -qO - https://www.mongodb.org/static/pgp/server-7.0.asc | sudo gpg --dearmor -o /usr/share/keyrings/mongodb-archive-keyring.gpg
@@ -25,13 +25,13 @@ sudo apt-get install -y mongodb-org
 sudo sed -i '/  bindIp:/c\  bindIp: 127.0.0.1,0.0.0.0' /etc/mongod.conf
 
 # Automatically enabling security and authorization if not already set
-if ! grep -q "authorization: enabled" /etc/mongod.conf; then
-    if grep -q "^security:" /etc/mongod.conf; then
-        sudo sed -i '/^security:/a \  authorization: enabled' /etc/mongod.conf
-    else
-        echo -e "security:\n  authorization: enabled" | sudo tee -a /etc/mongod.conf
-    fi
-fi
+# if ! grep -q "authorization: enabled" /etc/mongod.conf; then
+#     if grep -q "^security:" /etc/mongod.conf; then
+#         sudo sed -i '/^security:/a \  authorization: enabled' /etc/mongod.conf
+#     else
+#         echo -e "security:\n  authorization: enabled" | sudo tee -a /etc/mongod.conf
+#     fi
+# fi
 
 # Ensure MongoDB data and log directory permissions are correct
 sudo chown -R mongodb:mongodb /var/lib/mongodb
