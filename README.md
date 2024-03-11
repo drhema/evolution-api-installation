@@ -105,6 +105,9 @@ To start the Evolution API in production mode:
 
 ```bash
 screen
+```
+
+```bash
 npm run start:prod
 ```
 
