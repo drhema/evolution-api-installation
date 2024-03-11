@@ -115,4 +115,11 @@ Detach from the screen session by pressing `Ctrl+A` followed by `D`.
 
 ---
 
+access the API via
+https://sub.domain.com/manager
+insert your password or if u used the default
+```bash
+B6D711FCDE4D4FD5936544120E713976
+```
+
 for any support contact: me@ibrahim.agency
