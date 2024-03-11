@@ -68,6 +68,8 @@ fi
 echo "Applying configurations..."
 sudo sed -i "s|URL: localhost|URL: http://$sub_domain|" src/env.yml
 sudo sed -i "s|# - yourdomain.com|- \"$sub_domain\"|" src/env.yml
+sudo sed -i "s|TYPE: http|TYPE: https|" config.yml
+sudo sed -i "s|PORT: 8080 # 443|PORT: 443 # 443|" config.yml
 sudo sed -i "s|/etc/letsencrypt/live/<domain>/privkey.pem|/etc/letsencrypt/live/$sub_domain/privkey.pem|" src/env.yml
 sudo sed -i "s|/etc/letsencrypt/live/<domain>/fullchain.pem|/etc/letsencrypt/live/$sub_domain/fullchain.pem|" src/env.yml
 sudo sed -i "s|mongodb://root:root@localhost:27017/?authSource=admin&readPreference=primary&ssl=false&directConnection=true|mongodb://$db_mongo_user:$mongo_db_pass@$server_ip:27017/$db_mongo?authSource=admin&readPreference=primary&ssl=false&directConnection=true|" src/env.yml
@@ -79,6 +81,10 @@ echo "Waiting for 5 seconds..."
 sleep 2
 
 echo "Finalizing setup..."
+# Kill processes on port 8080
+sudo lsof -i :8080 | awk 'NR!=1 {print $2}' | xargs -r sudo kill -9
+# Kill processes on port 443
+sudo lsof -i :443 | awk 'NR!=1 {print $2}' | xargs -r sudo kill -9
 sudo apt update && sudo apt -y upgrade
 sudo systemctl reload nginx
 nginx -t && systemctl restart nginx
