@@ -126,4 +126,11 @@ modify src/env.yml
 ```bash
 nano src/env.yml
 ```
+```bash
+sudo lsof -i :8080
+sudo lsof -i :443
+sudo kill -9 17496
+```
+sudo nginx -t
+
 for any support contact: me@ibrahim.agency
