@@ -55,7 +55,7 @@ mongosh --port 27018 <<EOF
 use api_db
 db.createUser({
   user: "api_user",
-  pwd: "ApiPassword",
+  pwd: "ApiPassw0#rd",
   roles: [{ role: "readWrite", db: "api_db" }]
 })
 exit
@@ -63,9 +63,8 @@ EOF
 
 # Revert MongoDB port and IP binding to original
 sed -i '/^net:/,/^  bindIp:/s/^  port: 27018/  port: 27017/' /etc/mongod.conf
-sed -i '/^net:/,/^  bindIp:/s/^  bindIp: 0.0.0.0/  bindIp: 127.0.0.1/' /etc/mongod.conf
 
 # Placeholder for connection test
-echo "mongosh \"mongodb://api_user:ApiPassword@localhost:27017/api_db\""
+echo "mongosh \"mongodb://api_user:ApiPassw0#rd@localhost:27017/api_db\""
 
 echo "Please manually run the above mongosh command to test the connection."
