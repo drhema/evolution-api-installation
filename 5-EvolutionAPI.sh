@@ -90,7 +90,9 @@ sudo apt update && sudo apt -y upgrade
 sudo systemctl reload nginx
 nginx -t && systemctl restart nginx
 # npm and build the application
+echo "Waiting for 5 seconds..."
+sleep 2
 npm install
 npm run build
-
+sleep 1
 echo "Setup completed. Navigate to the evolution-api directory to start your application. write cd evolution-api then write screen then npm run start:prod"
