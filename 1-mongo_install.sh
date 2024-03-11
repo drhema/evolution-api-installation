@@ -27,50 +27,45 @@ sudo apt-get install -y mongodb-org
 sudo systemctl start mongod
 sudo systemctl enable mongod
 
+
 # Prepare MongoDB data directory and log file
 sudo chown -R mongodb:mongodb /var/lib/mongodb
 sudo chown mongodb:mongodb /var/log/mongodb/mongod.log
 
-# Install MongoDB Shell (mongosh)
+ Install Mongo Shell
 sudo apt-get install -y mongosh
 
-# Download, extract, and move mongosh binary
+# Download and install the specified version of Mongo Shell
 wget https://downloads.mongodb.com/compass/mongosh-2.1.5-linux-x64.tgz -O mongosh.tgz
 tar -zxvf mongosh.tgz
 sudo mv mongosh-2.1.5-linux-x64/bin/mongosh /usr/local/bin/
 
-# Configure MongoDB to use authentication
-echo "
-net:
-  port: 27017
-  bindIp: 0.0.0.0
-" | sudo tee /etc/mongod.conf
+# Modify MongoDB configuration
+sed -i '/^net:/,/^  bindIp:/s/^  port: 27017/  port: 27018/' /etc/mongod.conf
+sed -i '/^net:/,/^  bindIp:/s/^  bindIp: 127.0.0.1/  bindIp: 0.0.0.0/' /etc/mongod.conf
 
-# Restart MongoDB to apply the new configuration
-sudo systemctl restart mongod
+# Restart MongoDB on new port and with new IP binding
+mongod --port 27018 --dbpath /var/lib/mongodb --auth --logpath /var/log/mongodb/mongod.log &
 
-#!/bin/bash
+# Check Mongo Shell version
+mongosh --version
 
-# Prompt user for database details
-echo "Please enter the database name:"
-read databaseName
+# Connect to Mongo Shell and create user
+mongosh --port 27018 <<EOF
+use api_db
+db.createUser({
+  user: "api_user",
+  pwd: "ApiPassword",
+  roles: [{ role: "readWrite", db: "api_db" }]
+})
+exit
+EOF
 
-echo "Please enter the database user name:"
-read userName
-
-echo "Please enter the password for the database user:"
-read -s userPassword # -s flag hides input for security
-
-# Placeholder for MongoDB user creation
-# Note: In a real scenario, you'd use these variables in a `mongosh` command
-# that logs into MongoDB and executes the user creation command.
-# This step is highly context-specific and might require manual execution or automation via `expect`.
-
-echo "Attempting to create user and test connection (this part is not automated in the script)..."
+# Revert MongoDB port and IP binding to original
+sed -i '/^net:/,/^  bindIp:/s/^  port: 27018/  port: 27017/' /etc/mongod.conf
+sed -i '/^net:/,/^  bindIp:/s/^  bindIp: 0.0.0.0/  bindIp: 127.0.0.1/' /etc/mongod.conf
 
 # Placeholder for connection test
-# Again, in a real-world use, you'd replace this echo with a command that uses `mongosh`
-# to attempt a connection using the provided details.
-echo "mongosh \"mongodb://${userName}:${userPassword}@localhost:27017/${databaseName}\""
+echo "mongosh \"mongodb://api_user:ApiPassword@localhost:27017/api_db\""
 
 echo "Please manually run the above mongosh command to test the connection."
