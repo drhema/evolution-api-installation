@@ -68,8 +68,9 @@ fi
 echo "Applying configurations..."
 sudo sed -i "s|URL: localhost|URL: http://$sub_domain|" src/env.yml
 sudo sed -i "s|# - yourdomain.com|- \"$sub_domain\"|" src/env.yml
-sudo sed -i "s|TYPE: http|TYPE: https|" config.yml
-sudo sed -i "s|PORT: 8080 # 443|PORT: 443 # 443|" config.yml
+# Update server TYPE and PORT in config.yml
+sudo sed -i "/SERVER:/,/URL:/s|TYPE: http|TYPE: https|" config.yml
+sudo sed -i "/SERVER:/,/URL:/s|PORT: 8080 # 443|PORT: 443 # 443|" config.yml
 sudo sed -i "s|/etc/letsencrypt/live/<domain>/privkey.pem|/etc/letsencrypt/live/$sub_domain/privkey.pem|" src/env.yml
 sudo sed -i "s|/etc/letsencrypt/live/<domain>/fullchain.pem|/etc/letsencrypt/live/$sub_domain/fullchain.pem|" src/env.yml
 sudo sed -i "s|mongodb://root:root@localhost:27017/?authSource=admin&readPreference=primary&ssl=false&directConnection=true|mongodb://$db_mongo_user:$mongo_db_pass@$server_ip:27017/$db_mongo?authSource=admin&readPreference=primary&ssl=false&directConnection=true|" src/env.yml
