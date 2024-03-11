@@ -17,8 +17,29 @@ This guide outlines the necessary steps to install MongoDB, Redis, Nginx, and th
 #### 1.1 Download and run the MongoDB installation script
 
 ```bash
-wget https://raw.githubusercontent.com/drhema/evolution-api-installation/main/1-mongo.sh && chmod +x 1-mongo.sh && ./1-mongo.sh
+wget https://raw.githubusercontent.com/drhema/evolution-api-installation/main/1-mongo_install.sh && chmod +x 1-mongo_install.sh && ./1-mongo_install.sh
 ```
+```bash
+mongosh "mongodb://localhost:27017"
+```
+
+```bash
+use api_db
+db.createUser({
+  user: "api_user",
+  pwd: "ApiPassw0rd!2024",  // Use the intended password
+  roles: [{role: "readWrite", db: "api_db"}]
+})
+```
+
+```bash
+Exit
+```
+
+```bash
+mongosh 'mongodb://api_user:ApiPassw0rd!2024@localhost:27017/api_db'
+```
+
 
 #### 1.2 Check the status of MongoDB
 
