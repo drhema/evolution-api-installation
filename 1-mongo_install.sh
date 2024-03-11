@@ -64,7 +64,5 @@ EOF
 # Revert MongoDB port and IP binding to original
 sed -i '/^net:/,/^  bindIp:/s/^  port: 27018/  port: 27017/' /etc/mongod.conf
 
-# Placeholder for connection test
-echo "mongosh \"mongodb://api_user:ApiPassw0rd!2024@localhost:27017/api_db\""
+echo "Please manually run the user creation mongosh command to test the connection."
 
-echo "Please manually run the above mongosh command to test the connection."
