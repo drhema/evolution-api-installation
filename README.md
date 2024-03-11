@@ -122,4 +122,8 @@ insert your password or if u used the default
 B6D711FCDE4D4FD5936544120E713976
 ```
 
+modify src/env.yml
+```bash
+nano src/env.yml
+```
 for any support contact: me@ibrahim.agency
