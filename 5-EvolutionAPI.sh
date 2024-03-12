@@ -6,7 +6,7 @@ if [ "$(id -u)" != "0" ]; then
     exit 1
 fi
 
-# 1. Install Docker Compose
+# Updating and installing dependencies
 echo "Updating and installing Docker..."
 sudo apt update && sudo apt upgrade -y
 sudo apt-get remove docker docker-engine docker.io containerd runc -y
@@ -17,35 +17,41 @@ curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o 
 echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 sudo apt-get update
 sudo apt-get install docker-ce docker-ce-cli containerd.io docker-compose-plugin -y
+# Configuring firewall rules
 sudo ufw allow 8080/tcp
 sudo ufw allow 80/tcp
 sudo ufw allow 443/tcp
 sudo ufw allow 3000/tcp
 sudo ufw allow 6379/tcp
 sudo ufw allow 5432/tcp
-# Wait 5 seconds
 echo "Waiting for 5 seconds..."
 sleep 5
 
-# 2. Setup Evolution API environment
+# Setting up the Evolution API environment
 echo "Cloning Evolution API repository and setting up the environment..."
 git clone https://github.com/EvolutionAPI/evolution-api.git
 cd evolution-api
-sleep 1
 sudo apt-get install -y git zip unzip nload snapd curl wget
-sudo apt install npm -y
-npm install -g typescript
-sudo apt-get install -y nodejs
-npm install -g npm@latest
-npm install -g pm2@latest
+
+# Install NVM, Node.js, and NPM
+echo "Installing NVM and setting up Node.js environment..."
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
-source ~/.bashrc
+# Source nvm script to make it available in the current session
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+# Install the latest version of Node.js and set it as the default version
 nvm install node
+nvm use node
+nvm alias default node
+
+# Proceed with the setup...
+sleep 2
 cp src/dev-env.yml src/env.yml
 
 # Wait 3 seconds
 echo "Waiting for 3 seconds..."
-sleep 3
+sleep 2
 
 # 3. Configuration prompts
 read -p "Enter your subdomain: " sub_domain
