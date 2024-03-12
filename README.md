@@ -94,6 +94,14 @@ Set up the Evolution API along with its dependencies:
 wget https://raw.githubusercontent.com/drhema/evolution-api-installation/main/5-EvolutionAPI.sh && chmod +x 5-EvolutionAPI.sh && ./5-EvolutionAPI.sh
 ```
 
+Edit https and port 443:
+```bash
+nano src/env.yml
+```
+
+Edit http ===> https
+Port 8080 ===> 443
+
 Navigate to the evolution-api directory and restart Nginx:
 
 ```bash
