@@ -31,12 +31,16 @@ sleep 5
 echo "Cloning Evolution API repository and setting up the environment..."
 git clone https://github.com/EvolutionAPI/evolution-api.git
 cd evolution-api
+sleep 1
+sudo apt-get install -y git zip unzip nload snapd curl wget
 sudo apt install npm -y
 npm install -g typescript
 sudo apt-get install -y nodejs
 npm install -g npm@latest
 npm install -g pm2@latest
-sudo apt-get install -y git zip unzip nload snapd curl wget
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+source ~/.bashrc
+nvm install node
 cp src/dev-env.yml src/env.yml
 
 # Wait 3 seconds
