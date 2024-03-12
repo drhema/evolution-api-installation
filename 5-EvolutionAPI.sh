@@ -103,6 +103,10 @@ nginx -t && systemctl restart nginx
 echo "Waiting for 5 seconds..."
 sleep 2
 npm install
+npm install -g typescript
+curl -o src/whatsapp/services/whatsapp.baileys.service.ts https://raw.githubusercontent.com/drhema/evolution-api/main/src/whatsapp/services/whatsapp.baileys.service.ts
+sleep 1
 npm run build
+tsc
 sleep 1
 echo "Setup completed. Navigate to the evolution-api directory to start your application. write cd evolution-api then write screen then npm run start:prod"
