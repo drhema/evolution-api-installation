@@ -22,6 +22,8 @@ echo "Updating firewall rules..."
 ufw allow 3000/tcp
 ufw allow 6379/tcp
 ufw allow 5432/tcp
+ufw allow 8080/tcp
+ufw allow 10000/tcp
 ufw allow 'Nginx Full'
 ufw allow OpenSSH
 ufw --force enable
