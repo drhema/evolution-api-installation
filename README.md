@@ -94,13 +94,6 @@ Set up the Evolution API along with its dependencies:
 wget https://raw.githubusercontent.com/drhema/evolution-api-installation/main/5-EvolutionAPI.sh && chmod +x 5-EvolutionAPI.sh && ./5-EvolutionAPI.sh
 ```
 
-Edit https and port 443:
-```bash
-nano src/env.yml
-```
-
-Edit http ===> https
-Port 8080 ===> 443
 
 Navigate to the evolution-api directory and restart Nginx:
 
@@ -130,10 +123,15 @@ insert your password or if u used the default
 B6D711FCDE4D4FD5936544120E713976
 ```
 
-modify src/env.yml
+Edit https and port 443:
 ```bash
 nano src/env.yml
 ```
+```bash
+Edit http ===> https
+Port 8080 ===> 443
+```
+
 ```bash
 sudo lsof -i :8080
 sudo lsof -i :443
